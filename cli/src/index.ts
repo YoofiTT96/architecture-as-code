@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import { CALM_META_SCHEMA_DIRECTORY, getFormattedOutput, runGenerate, validate, visualizeInstantiation, visualizePattern } from '@finos/calm-shared';
+import { CALM_META_SCHEMA_DIRECTORY, CALM_SPECTRAL_RULES_DIRECTORY, getFormattedOutput, runGenerate, validate, visualizeInstantiation, visualizePattern } from '@finos/calm-shared';
 import { Option, program } from 'commander';
 import path from 'path';
 import { mkdirp } from 'mkdirp';
@@ -17,6 +17,7 @@ const STRICT_OPTION = '--strict';
 const VERBOSE_OPTION = '-v, --verbose';
 
 program
+    .name('calm')
     .version('0.2.5')
     .description('A set of tools for interacting with the Common Architecture Language Model (CALM)');
 
@@ -64,8 +65,12 @@ program
     .option(OUTPUT_OPTION, 'Path location at which to output the generated file.')
     .option(VERBOSE_OPTION, 'Enable verbose logging.', false)
     .action(async (options) => {
-        const outcome = await validate(options.instantiation, options.pattern, options.metaSchemasLocation, options.verbose);
-        const content = getFormattedOutput(outcome, options.format, options.instantiation, options.pattern);
+        const outcome = await validate(options.instantiation, options.pattern, options.schemaDirectory, options.verbose);
+
+        const spectralRulesetForInstantiation = CALM_SPECTRAL_RULES_DIRECTORY + '/instantiation/validation-rules.yaml';
+        const spectralRulesetForPattern = CALM_SPECTRAL_RULES_DIRECTORY + '/pattern/validation-rules.yaml';
+
+        const content = getFormattedOutput(outcome, options.format,spectralRulesetForInstantiation, spectralRulesetForPattern);
         writeOutputFile(options.output, content);
         exitBasedOffOfValidationOutcome(outcome, options.strict);
     }
@@ -77,7 +82,7 @@ function writeOutputFile(output: string, validationsOutput: string) {
         mkdirp.sync(dirname);
         writeFileSync(output, validationsOutput);
     } else {
-        console.log(validationsOutput);
+        process.stdout.write(validationsOutput);
     }
 }
 

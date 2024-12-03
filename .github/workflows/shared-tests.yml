@@ -1,15 +1,24 @@
+<<<<<<<< HEAD:.github/workflows/shared-tests.yml
 name: Build Shared Module
+========
+name: CLI
+>>>>>>>> refs/remotes/upstream/explore-cytoscape:.github/workflows/cli-tests.yml
 
 on:
   pull_request:
     branches:
       - "main"
     paths:
+<<<<<<<< HEAD:.github/workflows/shared-tests.yml
+========
+      - "cli/**"
+>>>>>>>> refs/remotes/upstream/explore-cytoscape:.github/workflows/cli-tests.yml
       - "shared/**"
   push:
     branches:
       - "main"
     paths:
+<<<<<<<< HEAD:.github/workflows/shared-tests.yml
       - "shared/**"
 
 defaults:
@@ -19,14 +28,31 @@ defaults:
 jobs:
   shared-tests:
     name: Run unit tests and lint
+========
+      - "cli/**"
+      - "shared/**"
+
+jobs:
+  cli:
+    name: Build, Test, and Lint CLI Module
+>>>>>>>> refs/remotes/upstream/explore-cytoscape:.github/workflows/cli-tests.yml
     runs-on: ubuntu-latest
+
     steps:
-      # Check out the repository
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Ensure full PR checkout
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: v20
-      - run: npm ci
-      - run: npm run test
-      - run: npm run lint
-      - run: npm run build
+
+      - name: Install workspace
+        run: npm ci
+
+      - name: Build workspace
+        run: npm run build
+
+      - name: Run tests for CLI
+        run: npm run test --workspace=cli
