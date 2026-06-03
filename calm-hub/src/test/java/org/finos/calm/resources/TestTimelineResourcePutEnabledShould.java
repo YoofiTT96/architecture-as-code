@@ -3,6 +3,7 @@ package org.finos.calm.resources;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import org.bson.json.JsonParseException;
 import org.finos.calm.domain.exception.NamespaceNotFoundException;
 import org.finos.calm.domain.exception.TimelineNotFoundException;
 import org.finos.calm.domain.timeline.Timeline;
@@ -45,6 +46,7 @@ public class TestTimelineResourcePutEnabledShould {
 
     static Stream<Arguments> provideParametersForPutTimelineTests() {
         return Stream.of(
+                Arguments.of(new JsonParseException(), 400),
                 Arguments.of(new NamespaceNotFoundException(), 404),
                 Arguments.of(new TimelineNotFoundException(), 404),
                 Arguments.of(null, 201)

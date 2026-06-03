@@ -90,7 +90,7 @@ public class TimelineResource {
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
         } catch (JsonParseException e) {
             logger.error("Cannot parse Timeline JSON for namespace [{}]. Timeline JSON : [{}]", namespace, STRICT_SANITIZATION_POLICY.sanitize(timelineRequest.getTimelineJson()), e);
-            return invalidTimelineJsonResponse(namespace);
+            return invalidTimelineJsonResponse();
         }
     }
 
@@ -182,6 +182,9 @@ public class TimelineResource {
         try {
             store.createTimelineForVersion(timeline);
             return timelineWithLocationResponse(timeline);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Timeline JSON for namespace [{}], timelineId [{}]", namespace, timelineId, e);
+            return invalidTimelineJsonResponse();
         } catch (TimelineVersionExistsException e) {
             logger.error("Timeline version already exists [{}] when trying to create new timeline", timeline, e);
             return Response.status(Response.Status.CONFLICT).entity("Version already exists: " + version).build();
@@ -225,6 +228,9 @@ public class TimelineResource {
         try {
             store.updateTimelineForVersion(timeline);
             return timelineWithLocationResponse(timeline);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Timeline JSON for namespace [{}], timelineId [{}]", namespace, timelineId, e);
+            return invalidTimelineJsonResponse();
         } catch (NamespaceNotFoundException e) {
             logger.error("Invalid namespace [{}] when trying to put timeline", timeline, e);
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
@@ -238,8 +244,8 @@ public class TimelineResource {
         return Response.created(new URI("/calm/namespaces/" + timeline.getNamespace() + "/timelines/" + timeline.getId() + "/versions/" + timeline.getDotVersion())).build();
     }
 
-    private Response invalidTimelineJsonResponse(String timelineJson) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("The timeline JSON could not be parsed: " + timelineJson).build();
+    private Response invalidTimelineJsonResponse() {
+        return Response.status(Response.Status.BAD_REQUEST).entity("The timeline JSON could not be parsed").build();
     }
 
     private Response invalidTimelineResponse(int timelineId) {

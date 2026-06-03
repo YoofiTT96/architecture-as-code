@@ -84,7 +84,7 @@ public class PatternResource {
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
         } catch (JsonParseException e) {
             logger.error("Cannot parse Pattern JSON for namespace [{}]. Pattern JSON : [{}]", namespace, STRICT_SANITIZATION_POLICY.sanitize(patternRequest.getPatternJson()), e);
-            return invalidPatternJsonResponse(STRICT_SANITIZATION_POLICY.sanitize(patternRequest.getPatternJson()));
+            return invalidPatternJsonResponse();
         }
     }
 
@@ -177,6 +177,9 @@ public class PatternResource {
         try {
             store.createPatternForVersion(pattern);
             return patternWithLocationResponse(pattern);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Pattern JSON for namespace [{}], patternId [{}]", namespace, patternId, e);
+            return invalidPatternJsonResponse();
         } catch (PatternVersionExistsException e) {
             logger.error("Pattern version already exists [{}] when trying to create new pattern", pattern, e);
             return Response.status(Response.Status.CONFLICT).entity("Version already exists: " + version).build();
@@ -220,6 +223,9 @@ public class PatternResource {
         try {
             store.updatePatternForVersion(pattern);
             return patternWithLocationResponse(pattern);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Pattern JSON for namespace [{}], patternId [{}]", namespace, patternId, e);
+            return invalidPatternJsonResponse();
         } catch (NamespaceNotFoundException e) {
             logger.error("Invalid namespace [{}] when trying to put pattern", pattern, e);
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
@@ -234,8 +240,8 @@ public class PatternResource {
     private Response patternWithLocationResponse(Pattern pattern) throws URISyntaxException {
         return Response.created(new URI("/calm/namespaces/" + pattern.getNamespace() + "/patterns/" + pattern.getId() + "/versions/" + pattern.getDotVersion())).build();
     }
-    private Response invalidPatternJsonResponse(String patternJson) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("The pattern JSON could not be parsed: " + patternJson).build();
+    private Response invalidPatternJsonResponse() {
+        return Response.status(Response.Status.BAD_REQUEST).entity("The pattern JSON could not be parsed").build();
     }
 
     private Response invalidPatternResponse(int patternId) {

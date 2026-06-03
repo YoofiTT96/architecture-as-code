@@ -111,7 +111,7 @@ public class ArchitectureResource {
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
         } catch (JsonParseException e) {
             logger.error("Cannot parse Architecture JSON for namespace [{}]. Architecture request : [{}]", namespace, architectureRequest, e);
-            return invalidArchitectureJsonResponse(namespace);
+            return invalidArchitectureJsonResponse();
         }
     }
 
@@ -198,6 +198,9 @@ public class ArchitectureResource {
         try {
             store.createArchitectureForVersion(architecture);
             return architectureWithLocationResponse(architecture);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Architecture JSON for namespace [{}], architectureId [{}]", namespace, architectureId, e);
+            return invalidArchitectureJsonResponse();
         } catch (ArchitectureVersionExistsException e) {
             logger.error("Architecture version already exists [{}] when trying to create new architecture", architecture, e);
             return Response.status(Response.Status.CONFLICT).entity("Version already exists: " + version).build();
@@ -240,6 +243,9 @@ public class ArchitectureResource {
         try {
             store.updateArchitectureForVersion(architecture);
             return architectureWithLocationResponse(architecture);
+        } catch (JsonParseException e) {
+            logger.error("Cannot parse Architecture JSON for namespace [{}], architectureId [{}]", namespace, architectureId, e);
+            return invalidArchitectureJsonResponse();
         } catch (NamespaceNotFoundException e) {
             logger.error("Invalid namespace [{}] when trying to put architecture", architecture, e);
             return CalmResourceErrorResponses.invalidNamespaceResponse(namespace);
@@ -283,8 +289,8 @@ public class ArchitectureResource {
         return Response.created(new URI("/calm/namespaces/" + architecture.getNamespace() + "/architectures/" + architecture.getId() + "/versions/" + architecture.getDotVersion())).build();
     }
 
-    private Response invalidArchitectureJsonResponse(String architectureJson) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("The architecture JSON could not be parsed: " + architectureJson).build();
+    private Response invalidArchitectureJsonResponse() {
+        return Response.status(Response.Status.BAD_REQUEST).entity("The architecture JSON could not be parsed").build();
     }
 
     private Response invalidArchitectureResponse(int architectureId) {

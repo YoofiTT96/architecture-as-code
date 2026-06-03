@@ -266,6 +266,7 @@ public class TestTimelineResourceShould {
 
     static Stream<Arguments> provideParametersForCreateTimelineTests() {
         return Stream.of(
+                Arguments.of(new JsonParseException(), 400),
                 Arguments.of(new NamespaceNotFoundException(), 404),
                 Arguments.of(new TimelineNotFoundException(), 404),
                 Arguments.of(new TimelineVersionExistsException(), 409),

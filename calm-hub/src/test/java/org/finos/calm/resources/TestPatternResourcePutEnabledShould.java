@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.stream.Stream;
 
 import org.finos.calm.domain.Pattern;
+import org.bson.json.JsonParseException;
 import org.finos.calm.domain.exception.NamespaceNotFoundException;
 import org.finos.calm.domain.exception.PatternNotFoundException;
 import org.finos.calm.store.PatternStore;
@@ -56,8 +57,9 @@ public class TestPatternResourcePutEnabledShould {
 
     static Stream<Arguments> provideParametersForPutPatternTests() {
         return Stream.of(
-                Arguments.of( new NamespaceNotFoundException(), 404),
-                Arguments.of( new PatternNotFoundException(), 404),
+                Arguments.of(new JsonParseException(), 400),
+                Arguments.of(new NamespaceNotFoundException(), 404),
+                Arguments.of(new PatternNotFoundException(), 404),
                 Arguments.of(null, 201)
         );
     }

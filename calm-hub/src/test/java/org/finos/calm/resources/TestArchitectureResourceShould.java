@@ -345,6 +345,7 @@ public class TestArchitectureResourceShould {
 
     static Stream<Arguments> provideParametersForCreateArchitectureTests() {
         return Stream.of(
+                Arguments.of(new JsonParseException(), 400),
                 Arguments.of(new NamespaceNotFoundException(), 404),
                 Arguments.of(new ArchitectureNotFoundException(), 404),
                 Arguments.of(new ArchitectureVersionExistsException(), 409),

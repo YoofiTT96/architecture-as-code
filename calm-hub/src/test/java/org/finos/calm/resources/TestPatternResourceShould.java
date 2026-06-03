@@ -323,8 +323,9 @@ public class TestPatternResourceShould {
 
     static Stream<Arguments> provideParametersForCreatePatternTests() {
         return Stream.of(
-                Arguments.of( new NamespaceNotFoundException(), 404),
-                Arguments.of( new PatternNotFoundException(), 404),
+                Arguments.of(new JsonParseException(), 400),
+                Arguments.of(new NamespaceNotFoundException(), 404),
+                Arguments.of(new PatternNotFoundException(), 404),
                 Arguments.of(new PatternVersionExistsException(), 409),
                 Arguments.of(null, 201)
         );

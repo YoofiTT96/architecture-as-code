@@ -8,6 +8,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import org.finos.calm.domain.Architecture;
 import org.finos.calm.domain.architecture.ArchitectureRequest;
+import org.bson.json.JsonParseException;
 import org.finos.calm.domain.exception.ArchitectureNotFoundException;
 import org.finos.calm.domain.exception.ArchitectureVersionExistsException;
 import org.finos.calm.domain.exception.NamespaceNotFoundException;
@@ -67,6 +68,7 @@ public class TestArchitectureResourcePutEnabledShould {
 
     static Stream<Arguments> provideParametersForCreateArchitectureTests() {
         return Stream.of(
+                Arguments.of(new JsonParseException(), 400),
                 Arguments.of(new NamespaceNotFoundException(), 404),
                 Arguments.of(new ArchitectureNotFoundException(), 404),
                 Arguments.of(null, 201)
